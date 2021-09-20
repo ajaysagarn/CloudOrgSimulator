@@ -13,4 +13,4 @@ object ObtainConfigReference:
     case Success(_) => true
   }
 
-  def apply(confEntry:String): Option[Config] = if ValidateConfig(confEntry) then Some(config) else None
+  def apply(confEntry:String): Option[Config] = if ValidateConfig(confEntry) then Some(config.getConfig(confEntry)) else None
