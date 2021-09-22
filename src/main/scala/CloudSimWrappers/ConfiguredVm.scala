@@ -21,7 +21,10 @@ class ConfiguredVm(simulation: Simulation,broker: DatacenterBroker, config: Conf
   val logger = CreateLogger(classOf[ConfiguredVm])
   val vms:List[VmSimple] = createVms()
 
-  val vmTimeLogs: List[String] = List.empty[String]
+  var vmTimeLogs: List[String] = List("Start")
+
+  case class VMLogs(logs:List[String])
+  var myVMLogs = VMLogs(List.empty[String])
 
   def createVms(): List[VmSimple] = {
     val vms = List.fill(config.getInt("vm.InitialCount"))(new VmSimple(config.getDouble("vm.mipsCapacity"), config.getLong("vm.Pes")))
@@ -29,6 +32,7 @@ class ConfiguredVm(simulation: Simulation,broker: DatacenterBroker, config: Conf
       vm.setRam(config.getInt("vm.RAMInMBs"))
       vm.setBw(config.getInt("vm.BandwidthInMBps"))
       vm.setSize(config.getInt("vm.StorageInMMapBs"))
+      vm.setCloudletScheduler(new CloudletSchedulerTimeShared())
       vm.setSubmissionDelay(config.getInt("vm.DefaultSubmissionDelay"))
 
       if(config.getBoolean("vm.VerticalCpuScalingEnabled")){
@@ -40,22 +44,19 @@ class ConfiguredVm(simulation: Simulation,broker: DatacenterBroker, config: Conf
       }
     })
 
-    if( config.getBoolean("vm.VerticalCpuScalingEnabled") || config.getBoolean("vm.VerticalCpuScalingEnabled")) {
-      simulation.addOnClockTickListener(this.onClockTickListener)
-    }
+    simulation.addOnClockTickListener(this.onClockTickListener)
 
     vms
   }
 
   def getVms: List[VmSimple] = vms
 
-  def getVmTimeLogs: List[String] = vmTimeLogs
+  def getVmTimeLogs: List[String] = myVMLogs.logs
 
 
   def submitinitialVms(): Unit ={
     broker.submitVmList(vms.asJava)
   }
-
 
 
   def onClockTickListener(evt: EventInfo): Unit = {
@@ -64,26 +65,25 @@ class ConfiguredVm(simulation: Simulation,broker: DatacenterBroker, config: Conf
     vms.foreach(vm => {
       val time = evt.getTime
       val vmid = vm.getId
-      val cpuUtil = vm.getCpuPercentUtilization * 100.0
-      val noPes = vm.getNumberOfPes
-      val cloudlets = vm.getCloudletScheduler.getCloudletExecList.size
-      val ramutilPercent = vm.getRam.getPercentUtilization * 100
-      val ramAllocation = vm.getRam.getAllocatedResource
+      val cpuUtil = vm.getCpuPercentUtilization() * 100.0
+      val noPes = vm.getNumberOfPes()
+      val cloudlets = vm.getCloudletScheduler.getCloudletExecList.size()
+      val ramutilPercent = vm.getRam.getPercentUtilization() * 100
+      val ramAllocation = vm.getRam.getAllocatedResource()
 
-      val log = f"Time $time: Vm $vmid CPU Usage: $cpuUtil%% ($noPes vCPUs. Running Cloudlets: #$cloudlets). RAM usage: $ramutilPercent%%  ($ramAllocation MB) \n"
+      val log = f"Time $time: Vm $vmid CPU Usage:$cpuUtil percentage ($noPes vCPUs. Running Cloudlets: #$cloudlets). RAM usage: $ramutilPercent  ($ramAllocation MB) \n"
+      val newList = vmTimeLogs ::: List(log)
+      myVMLogs = myVMLogs.copy(myVMLogs.logs ::: List(log))
+      logger.trace(log)
 
-      addVmTimeLog(log)
+
 
     })
     //vms.foreach( (vm:VmSimple) => logger.info("\t\tTime {}: Vm {} CPU Usage: {}%% ({} vCPUs. Running Cloudlets: #{}). RAM usage: {}%% ({} MB)%n", evt.getTime, vm.getId, vm.getCpuPercentUtilization * 100.0, vm.getNumberOfPes, vm.getCloudletScheduler.getCloudletExecList.size, vm.getRam.getPercentUtilization * 100, vm.getRam.getAllocatedResource))
   }
 
-  def addVmTimeLog(log:String): Unit = {
-    vmTimeLogs ::: List(log)
-  }
-
   private def createVerticalPeScaling = { //The percentage in which the number of PEs has to be scaled
-    val scalingFactor = config.getLong("vm.VerticalCpuScaling.ScalingFactor")
+    val scalingFactor = config.getDouble("vm.VerticalCpuScaling.ScalingFactor")
     val verticalCpuScaling = new VerticalVmScalingSimple(classOf[Processor], scalingFactor)
 
     verticalCpuScaling.setResourceScaling((vs: VerticalVmScaling) => 2 * vs.getScalingFactor * vs.getAllocatedResource)
@@ -102,7 +102,7 @@ class ConfiguredVm(simulation: Simulation,broker: DatacenterBroker, config: Conf
   }
 
   private def createVerticalRamScaling = { //The percentage in which the number of PEs has to be scaled
-    val scalingFactor = config.getLong("vm.VerticalRamScaling.ScalingFactor")
+    val scalingFactor = config.getDouble("vm.VerticalRamScaling.ScalingFactor")
     val verticalRamScaling = new VerticalVmScalingSimple(classOf[Ram], scalingFactor)
 
     /* By uncommenting the line below, you will see that, instead of gradually
@@ -143,3 +143,5 @@ class ConfiguredVm(simulation: Simulation,broker: DatacenterBroker, config: Conf
   private def isVmOverloaded(vm: Vm) = vm.getCpuPercentUtilization > config.getLong("vm.HorizontalScaling.OverLoadThreshold")
 
 }
+
+
