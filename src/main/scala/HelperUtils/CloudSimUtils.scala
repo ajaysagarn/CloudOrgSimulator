@@ -3,6 +3,7 @@ package HelperUtils
 import com.typesafe.config.Config
 import org.cloudbus.cloudsim.allocationpolicies.{VmAllocationPolicy, VmAllocationPolicyBestFit, VmAllocationPolicyFirstFit, VmAllocationPolicyRandom, VmAllocationPolicyRoundRobin, VmAllocationPolicySimple}
 import org.cloudbus.cloudsim.distributions.UniformDistr
+import org.cloudbus.cloudsim.provisioners.{PeProvisionerSimple, ResourceProvisioner, ResourceProvisionerSimple}
 import org.cloudbus.cloudsim.schedulers.vm.{VmSchedulerAbstract, VmSchedulerSpaceShared, VmSchedulerTimeShared}
 import org.cloudbus.cloudsim.utilizationmodels.{UtilizationModel, UtilizationModelDynamic, UtilizationModelFull, UtilizationModelPlanetLab, UtilizationModelStochastic}
 
@@ -25,6 +26,12 @@ object CloudSimUtils {
     case "FirstFit" => new VmAllocationPolicyFirstFit()
     case "RoundRobin" => new VmAllocationPolicyRoundRobin()
     case _ => throw new RuntimeException("Unsupported Vm Allocation Policy")
+  }
+
+  def getResourceProvisioner(t: String): ResourceProvisioner = t match {
+    case  "PeSimple" => new PeProvisionerSimple()
+    case "ResourceSimple" => new ResourceProvisionerSimple()
+    case _ => throw new RuntimeException("Unsupported Resource Provisioner")
   }
 
   def getUtilizationModel(t: String): UtilizationModel = t match {
