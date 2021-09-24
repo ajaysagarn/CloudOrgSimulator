@@ -17,7 +17,7 @@ import collection.JavaConverters.*
 class MixedSimulation
 object MixedSimulation:
   @main
-  def start(): Unit ={
+  def StartMixedSimulation(): Unit ={
     val logger = CreateLogger(classOf[StartSimulation])
 
     val saasConfig = CloudSimUtils.getconfigValue("Saas","saasDataCenter")
@@ -57,9 +57,9 @@ object MixedSimulation:
 
     //make the changes to the iaas datacenter according to the requests made by an external customer
     iaasvms.applyCustomerChanges(iaasCustomerInptuts)
-    
-    
-    
+
+
+
     saasVms.submitinitialVms();
     paasVms.submitinitialVms();
     iaasvms.submitinitialVms();
