@@ -16,13 +16,15 @@ import org.cloudbus.cloudsim.utilizationmodels.{UtilizationModelDynamic, Utiliza
 import org.cloudbus.cloudsim.vms.{Vm, VmSimple}
 import org.cloudsimplus.builders.tables.CloudletsTableBuilder
 
+import scala.jdk.OptionConverters.*
 import collection.JavaConverters.*
+
 import scala.util.Random
 
 class RandomVmAllocationSim
 
 object RandomVmAllocationSim:
-  val config = ObtainConfigReference("randomCloudVmAllocation") match {
+  val config = ObtainConfigReference("","randomCloudVmAllocation") match {
     case Some(value) => value
     case None => throw new RuntimeException("Cannot obtain a reference to the config data.")
   }
@@ -67,8 +69,9 @@ object RandomVmAllocationSim:
 
 
   def findRandomSuitableHostForVm(vmAllocationPolicy: VmAllocationPolicy, vm: Vm) =
-    val hostList = vmAllocationPolicy.getHostList()
-    hostList.get(Random.nextInt(hostList.size()))
+    val hostList = vmAllocationPolicy.getHostList().asScala.toList.map((x:Host) => x)
+    hostList.find(host => host.isSuitableForVm(vm)).toJava
+    
 
 
 
