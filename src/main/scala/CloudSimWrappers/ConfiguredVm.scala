@@ -1,7 +1,6 @@
 package CloudSimWrappers
 
 import HelperUtils.{CloudSimUtils, CreateLogger}
-import Simulations.StartSimulation
 import com.typesafe.config.Config
 import org.cloudbus.cloudsim.brokers.DatacenterBroker
 import org.cloudbus.cloudsim.core.Simulation

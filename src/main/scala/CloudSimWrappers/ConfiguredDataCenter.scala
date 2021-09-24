@@ -1,8 +1,6 @@
 package CloudSimWrappers
 
-import HelperUtils.CloudSimUtils
-import Simulations.BasicCloudSimPlusExample.config
-import Simulations.RandomVmAllocationSim.config
+import HelperUtils.{CloudSimUtils}
 import com.typesafe.config.Config
 import org.cloudbus.cloudsim.core.{CloudSim, Simulation}
 import org.cloudbus.cloudsim.datacenters.{Datacenter, DatacenterSimple}
