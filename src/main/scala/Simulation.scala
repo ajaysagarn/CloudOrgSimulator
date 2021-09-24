@@ -1,5 +1,5 @@
-import HelperUtils.{CreateLogger, ObtainConfigReference}
-import Simulations.{MixedSimulation, RandomVmAllocationSim}
+import HelperUtils.CreateLogger
+import Simulations.MixedSimulation
 import com.typesafe.config.ConfigFactory
 import org.slf4j.LoggerFactory
 
