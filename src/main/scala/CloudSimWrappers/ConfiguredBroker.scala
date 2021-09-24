@@ -3,6 +3,7 @@ package CloudSimWrappers
 import com.typesafe.config.Config
 import org.cloudbus.cloudsim.brokers.{DatacenterBroker, DatacenterBrokerBestFit, DatacenterBrokerFirstFit, DatacenterBrokerSimple}
 import org.cloudbus.cloudsim.core.{CloudSim, Simulation}
+import org.cloudbus.cloudsim.datacenters.network.NetworkDatacenter
 
 class ConfiguredBroker(simulation: CloudSim, config: Config) {
 
