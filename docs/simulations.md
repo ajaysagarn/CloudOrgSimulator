@@ -20,7 +20,7 @@ Simulations were run applying multiple combinations of the above schedulers to t
 
 The output of the simulation when using Time shared scheduling for both cloudlet and vm, and using SpaceShared shared scheduling for cloudlet and vm are shown below.
 
-[Image Url here]
+![image](./images/TimeVSpace.PNG)
 
 Output summary from other combinations:
 
@@ -54,15 +54,15 @@ The same Map Reduce job is passed to multiple simulations with different combina
 
 Simulation output with horizontal scaling Vs CPU and RAM vertical scaling enabled:
 
-[Image Url here]
+![Image](./images/HSVCPURAM.PNG)
 
 Simulation output with horizontal scaling Vs only CPU vertical scaling enabled:
 
-[Image Url here]
+![Image](./images/HSVCPU.PNG)
 
 Simulation output with horizontal scaling Vs only RAM vertical scaling enabled:
 
-[Image Url here]
+![Image](./images/HSVRAM.PNG)
 
 #### Conclusions:
 
@@ -82,7 +82,7 @@ Thus, in this simulation, we assume an external customer would not have any cont
 
 Multiple MapReduce Jobs are created and passed to the broker which then send the jobs to the respective datacenter as shown below:
 
-[image her of the diag]
+![Image](./images/mixedImpl.PNG)
 
 
 
