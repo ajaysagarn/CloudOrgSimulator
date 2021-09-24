@@ -101,7 +101,7 @@ MapReduceJob  {
 ```
 
 This configuration accepts the total size of the map-reduce job as well as the split size for every mapper operation. The total number of mapper cloudlets generated
-would depend on the total size and the split size of the map-reduce job.
+would depend on the total size and the split size of the map-reduce job. The default utilization model is set to Stochastic as it provides a more real world utilization value. This can be changed to Full in the Config file to create map reduce cloudlets that use the full utilization model.
 
 A MapReduceJob class has been written that generates mapper and reducer cloudlets and also continuously listens to the execution of every mapper cloudlet. Once a Mapper cloudlet is done executing,
 a corresponding reducer cloudlet is dynamically submitted to the broker with an added delay inorder to simulate network-bw/transfer delays. This class also has functionality to assign the mapper/reducer cloudlets to a 
