@@ -20,7 +20,7 @@ Simulations were run applying multiple combinations of the above schedulers to t
 
 The output of the simulation when using Time shared scheduling for both cloudlet and vm, and using SpaceShared shared scheduling for cloudlet and vm are shown below.
 
-![image](https://www.github.com/ajaysagarn/ClouOrgSimulator/blob/main/docs/images/TimeVSpace.PNG)
+![image](https://www.github.com/ajaysagarn/ClouOrgSimulator/blob/main/docs/images/TimeVSpace.PNG?raw=true)
 
 Output summary from other combinations:
 
