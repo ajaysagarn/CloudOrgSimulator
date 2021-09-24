@@ -1,55 +1,60 @@
 package CloudSimWrappers
 
-import HelperUtils.CreateLogger
+import HelperUtils.{CloudSimUtils, CreateLogger}
 import Simulations.StartSimulation
 import com.typesafe.config.Config
 import org.cloudbus.cloudsim.brokers.DatacenterBroker
 import org.cloudbus.cloudsim.core.Simulation
+import org.cloudbus.cloudsim.datacenters.Datacenter
 import org.cloudbus.cloudsim.hosts.HostSimple
 import org.cloudbus.cloudsim.resources.{Processor, Ram}
 import org.cloudbus.cloudsim.schedulers.cloudlet.CloudletSchedulerTimeShared
+import org.cloudbus.cloudsim.vms.network.NetworkVm
 import org.cloudbus.cloudsim.vms.{Vm, VmSimple}
 import org.cloudsimplus.autoscaling.resources.ResourceScalingInstantaneous
 import org.cloudsimplus.autoscaling.{HorizontalVmScaling, HorizontalVmScalingSimple, VerticalVmScaling, VerticalVmScalingSimple}
 import org.cloudsimplus.listeners.EventInfo
 
+import java.util.function.Supplier
 import collection.JavaConverters.*
 import scala.::
 
 class ConfiguredVm(simulation: Simulation,broker: DatacenterBroker, config: Config) {
 
   val logger = CreateLogger(classOf[ConfiguredVm])
-  val vms:List[VmSimple] = createVms()
+  var vms:List[NetworkVm] = createVms()
 
-  var vmTimeLogs: List[String] = List("Start")
+  var vmTimeLogs: List[String] = List.empty[String]
 
   case class VMLogs(logs:List[String])
   var myVMLogs = VMLogs(List.empty[String])
 
-  def createVms(): List[VmSimple] = {
-    val vms = List.fill(config.getInt("vm.InitialCount"))(new VmSimple(config.getDouble("vm.mipsCapacity"), config.getLong("vm.Pes")))
+  def createVms(): List[NetworkVm] = {
+    val vms = List.fill(config.getInt("vm.InitialCount"))(new NetworkVm(config.getLong("vm.mipsCapacity"), config.getInt("vm.Pes")))
     vms.foreach(vm =>{
       vm.setRam(config.getInt("vm.RAMInMBs"))
       vm.setBw(config.getInt("vm.BandwidthInMBps"))
       vm.setSize(config.getInt("vm.StorageInMMapBs"))
-      vm.setCloudletScheduler(new CloudletSchedulerTimeShared())
+      vm.setCloudletScheduler(CloudSimUtils.getCloudletScheduler(config.getString("vm.CloudletSchedulerType")))
       vm.setSubmissionDelay(config.getInt("vm.DefaultSubmissionDelay"))
 
-      if(config.getBoolean("vm.VerticalCpuScalingEnabled")){
+      if(config.hasPath("vm.VerticalCpuScalingEnabled") && config.getBoolean("vm.VerticalCpuScalingEnabled")){
         vm.setPeVerticalScaling(this.createVerticalPeScaling)
       }
-      val value = config.getBoolean("vm.VerticalRamScalingEnabled")
-      if(config.getBoolean("vm.VerticalRamScalingEnabled")) {
+
+      if(config.hasPath("vm.VerticalRamScalingEnabled") && config.getBoolean("vm.VerticalRamScalingEnabled")) {
         vm.setRamVerticalScaling(this.createVerticalRamScaling)
       }
+
+      if(config.hasPath("vm.HorizontalScalingEnabled") && config.getBoolean("vm.HorizontalScalingEnabled")) {
+        vm.setHorizontalScaling(this.createHorizontalVmScaling)
+      }
     })
-
     simulation.addOnClockTickListener(this.onClockTickListener)
-
     vms
   }
 
-  def getVms: List[VmSimple] = vms
+  def getVms: List[NetworkVm] = vms
 
   def getVmTimeLogs: List[String] = myVMLogs.logs
 
@@ -58,10 +63,38 @@ class ConfiguredVm(simulation: Simulation,broker: DatacenterBroker, config: Conf
     broker.submitVmList(vms.asJava)
   }
 
+  def applyCustomerChanges(custconfig: Config): Unit = {
+    if(vms.size < custconfig.getInt("InitialCount")){
+      val additionalVms: List[NetworkVm] = List.fill(custconfig.getInt("InitialCount") - vms.size)(createVm)
+      vms = vms ::: additionalVms
+    }
+
+    vms.foreach(vm => {
+      vm.setRam(custconfig.getInt("RAMInMBs"))
+      vm.setBw(custconfig.getInt("BandwidthInMBps"))
+      vm.setSize(custconfig.getInt("StorageInMMapBs"))
+
+      if(custconfig.hasPath("VerticalCpuScalingEnabled") && custconfig.getBoolean("VerticalCpuScalingEnabled")){
+        vm.setPeVerticalScaling(this.createVerticalPeScaling)
+      }
+
+      if(custconfig.hasPath("VerticalRamScalingEnabled") && custconfig.getBoolean("VerticalRamScalingEnabled")) {
+        vm.setRamVerticalScaling(this.createVerticalRamScaling)
+      }
+
+      if(custconfig.hasPath("HorizontalScalingEnabled") && custconfig.getBoolean("HorizontalScalingEnabled")) {
+        vm.setHorizontalScaling(this.createHorizontalVmScaling)
+      }
+
+    })
+
+
+
+  }
+
 
   def onClockTickListener(evt: EventInfo): Unit = {
     //perform some logging here to print current vm and host utilization metrics
-
     vms.foreach(vm => {
       val time = evt.getTime
       val vmid = vm.getId
@@ -75,11 +108,23 @@ class ConfiguredVm(simulation: Simulation,broker: DatacenterBroker, config: Conf
       val newList = vmTimeLogs ::: List(log)
       myVMLogs = myVMLogs.copy(myVMLogs.logs ::: List(log))
       logger.trace(log)
-
-
-
     })
-    //vms.foreach( (vm:VmSimple) => logger.info("\t\tTime {}: Vm {} CPU Usage: {}%% ({} vCPUs. Running Cloudlets: #{}). RAM usage: {}%% ({} MB)%n", evt.getTime, vm.getId, vm.getCpuPercentUtilization * 100.0, vm.getNumberOfPes, vm.getCloudletScheduler.getCloudletExecList.size, vm.getRam.getPercentUtilization * 100, vm.getRam.getAllocatedResource))
+  }
+
+  private def createHorizontalVmScaling = {
+    val horizontalScaling = new HorizontalVmScalingSimple
+    horizontalScaling.setVmSupplier(() => this.createVm).setOverloadPredicate(this.isVmOverloaded)
+    horizontalScaling
+  }
+
+  private def createVm = {
+    val vm = new NetworkVm(config.getLong("vm.mipsCapacity"), config.getInt("vm.Pes"))
+    vm.setRam(config.getInt("vm.RAMInMBs"))
+    vm.setBw(config.getInt("vm.BandwidthInMBps"))
+    vm.setSize(config.getInt("vm.StorageInMMapBs"))
+    vm.setCloudletScheduler(CloudSimUtils.getCloudletScheduler(config.getString("vm.CloudletSchedulerType")))
+    vm.setSubmissionDelay(config.getInt("vm.DefaultSubmissionDelay"))
+    vm
   }
 
   private def createVerticalPeScaling = { //The percentage in which the number of PEs has to be scaled
