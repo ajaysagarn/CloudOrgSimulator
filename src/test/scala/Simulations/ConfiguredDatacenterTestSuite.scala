@@ -7,6 +7,9 @@ import CloudSimWrappers.{ConfiguredBroker, ConfiguredDataCenter, ConfiguredVm}
 import org.cloudbus.cloudsim.core.CloudSim
 import org.cloudbus.cloudsim.hosts.network.NetworkHost
 
+/**
+ * Test Suite to test datacenter creation as per provided configuration
+ */
 class ConfiguredDatacenterTestSuite extends AnyFlatSpec with Matchers{
 
   val saasConfig = CloudSimUtils.getconfigValue("Saas","saasDataCenter")
@@ -19,10 +22,10 @@ class ConfiguredDatacenterTestSuite extends AnyFlatSpec with Matchers{
     val datacenter = new ConfiguredDataCenter(testSim,saasConfig).getConfiguredDataCenter()
 
     val dcCharac = datacenter.getCharacteristics
-    assert(dcCharac.getCostPerBw == saasConfig.getDouble("costPerBW"))
-    assert(dcCharac.getCostPerSecond == saasConfig.getDouble("costPerCPUSecond"))
-    assert(dcCharac.getCostPerMem == saasConfig.getDouble("costPerMemory"))
-    assert(dcCharac.getCostPerStorage == saasConfig.getDouble("costPerStorage"))
+    assert(dcCharac.getCostPerBw == saasConfig.getDouble("costPerBW"))  //check if the bandwidth is same as the config
+    assert(dcCharac.getCostPerSecond == saasConfig.getDouble("costPerCPUSecond")) //check if the costPerCPUSecond is same as the config
+    assert(dcCharac.getCostPerMem == saasConfig.getDouble("costPerMemory")) //check if the costPerMemory is same as the config
+    assert(dcCharac.getCostPerStorage == saasConfig.getDouble("costPerStorage")) //check if the costPerStorage is same as the config
   }
 
   "ConfiguredDatacenter" should "Have correct policies" in {
@@ -40,9 +43,9 @@ class ConfiguredDatacenterTestSuite extends AnyFlatSpec with Matchers{
     assert(dcHosts.size() ==  saasConfig.getInt("host.Count"))
 
     dcHosts.forEach(host =>{
-      assert(host.getMips() == saasConfig.getDouble("host.PemipsCapacity"))
-      assert(host.getRam().getCapacity() == saasConfig.getLong("host.RAMInMBs"))
-      assert(host.getNumberOfPes() == saasConfig.getDouble("host.Pes"))
+      assert(host.getMips() == saasConfig.getDouble("host.PemipsCapacity")) //check if the PemipsCapacity is same as the config
+      assert(host.getRam().getCapacity() == saasConfig.getLong("host.RAMInMBs")) //check if the RAMInMBs is same as the config
+      assert(host.getNumberOfPes() == saasConfig.getDouble("host.Pes")) //check if the Pes is same as the config
     })
   }
 

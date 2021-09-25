@@ -14,13 +14,27 @@ import org.cloudbus.cloudsim.resources.PeSimple
 
 import collection.JavaConverters.*
 
+/**
+ * Creates a @Link{NetworkDatacenter} instance based on the configuration passed
+ * @param simulation - The cloudsim simulation instance
+ * @param config - The configuration to be used to set up the datacenter
+ */
 class ConfiguredDataCenter(simulation: Simulation, config: Config) {
 
   val dataCenter = createDatacenter()
-  
+
+  /**
+   * Get the datacenter instance
+   * @return NetworkDatacenter
+   */
   def getConfiguredDataCenter(): NetworkDatacenter = dataCenter
 
+  /**
+   * Creates the datacenter instance
+   * @return
+   */
   def createDatacenter(): NetworkDatacenter = {
+    // create a list of hosts for the datacenter
     val hosts: List[Host] = getHostList()
     val dc = new NetworkDatacenter(simulation,hosts.asJava,CloudSimUtils.getDcVmAllocationPolicy(config.getString("VMAllocationPolicy")))
     dc.setSchedulingInterval(config.getDouble("schedulingInterval"))
@@ -34,6 +48,10 @@ class ConfiguredDataCenter(simulation: Simulation, config: Config) {
     dc
   }
 
+  /**
+   * Creates a list of hosts for the datacenter based on the config
+   * @return List[Host]
+   */
   def getHostList(): List[Host] = {
     val hostCount = if (config.getString("host.CreationType") == "static") config.getInt("host.Count") else 0
     List.fill(hostCount)(new NetworkHost(config.getLong("host.RAMInMBs"),
@@ -45,6 +63,10 @@ class ConfiguredDataCenter(simulation: Simulation, config: Config) {
       .setBwProvisioner(ResourceProvisionerSimple()))
   }
 
+  /**
+   * Creates a list of Processing entities (Pes) for the host based on the config
+   * @return List[Pesimple]
+   */
   def getPes(): List[PeSimple] = {
     List.fill(config.getInt("host.Pes"))(new PeSimple(config.getDouble("host.PemipsCapacity"),PeProvisionerSimple()))
   }

@@ -44,21 +44,16 @@ object StartSimulation {
 
     val mapreduceConfig: Config = CloudSimUtils.getconfigValue("mapreduce","MapReduceJob")
 
-    val mapReduceJob = new MapReduceJob(simulation,broker,mapreduceConfig)
+    val mapReduceJob = new MapReduceJob(simulation,broker,mapreduceConfig) // create a new map reduce jon
 
     val mapperCloudletList = mapReduceJob.getMappers()
 
-    broker.submitCloudletList(mapReduceJob.getMappers().asJava)
+    broker.submitCloudletList(mapReduceJob.getMappers().asJava) //submit the map reduce job to the broker
 
     logger.info("Cloudlets submitted to broker")
     simulation.start()
 
     new CloudletsTableBuilder(broker.getCloudletFinishedList()).build();
-
-    val vmLogs = vms.getVmTimeLogs
-    vms.getVmTimeLogs.foreach(log => {
-      logger.info(log)
-    })
 
     val vmsCreated = broker.getVmCreatedList[NetworkVm]
     val total:CostTotals  = CloudSimUtils.VmCostMetrics(vmsCreated.asScala.toList, true)
@@ -68,7 +63,7 @@ object StartSimulation {
     val saasmapperCosts = CloudSimUtils.cost1(datacenter,mapReduceJob.getMappers())
     val saasreducerCosts = CloudSimUtils.cost1(datacenter,mapReduceJob.getReducers())
     println(saasmapperCosts + saasreducerCosts)
-
+    logger.info("Simulation ended")
   }
 
 

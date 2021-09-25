@@ -7,6 +7,9 @@ import org.cloudbus.cloudsim.core.CloudSim
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
+/**
+ * Test suite to test if the Mapreduce job is created as per the configuration provided
+ */
 class MapreduceJobTestSuite extends AnyFlatSpec with Matchers{
   val config = CloudSimUtils.getconfigValue("mapreduce","MapReduceJob")
   val configDc = CloudSimUtils.getconfigValue("Saas","saasDataCenter")
@@ -28,11 +31,11 @@ class MapreduceJobTestSuite extends AnyFlatSpec with Matchers{
     val reducers = job.getReducers()
 
     mappers.foreach(mapper => {
-      assert(mapper.getNumberOfPes == config.getLong("MapperPe"))
+      assert(mapper.getNumberOfPes == config.getLong("MapperPe")) //verify the mapper pes
     })
 
     reducers.foreach(reducer => {
-      assert(reducer.getNumberOfPes == config.getLong("ReducerPe"))
+      assert(reducer.getNumberOfPes == config.getLong("ReducerPe")) //verify the reducer pes
     })
   }
 
@@ -42,7 +45,7 @@ class MapreduceJobTestSuite extends AnyFlatSpec with Matchers{
     val mappers = job.getMappers()
     job.submitJob()
 
-    assert(broker.getCloudletSubmittedList.size() == mappers.size)
+    assert(broker.getCloudletSubmittedList.size() == mappers.size) //check if all mappers have been submitted to the broker
   }
 
 }

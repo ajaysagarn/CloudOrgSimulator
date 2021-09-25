@@ -3,6 +3,8 @@
 Wrapper classes are written for the core components of cloud sim library where each class can take in a config and provide the required instance of a cloudSim entity after applying all the parameters. This enables code re-usability and also allows in testing different combinations
 of the cloud infrastructure by simple modifying or supplying a new config.
 
+In all the simulations in this project use three classes ```ConfigureBroker``` ```ConfigureDataCenter``` and ```ConfigureVm``` to generate instances required of the classes according to some simulation specific configurations.
+
 The Structure of a config file is as shown below
 
 ```conf
@@ -99,3 +101,8 @@ would depend on the total size and the split size of the map-reduce job. The def
 A MapReduceJob class has been written that generates mapper and reducer cloudlets and also continuously listens to the execution of every mapper cloudlet. Once a Mapper cloudlet is done executing,
 a corresponding reducer cloudlet is dynamically submitted to the broker with an added delay inorder to simulate network-bw/transfer delays. This class also has functionality to assign the mapper/reducer cloudlets to a
 specific datacenter provided.
+
+### Test Cases
+
+- Unit test cases are written to test the creation of CloudSimPlus instances (datacenter, broket, Vms) in the wrapper classes as per a given configuration file.
+- The MapReduce job is also covered under test cases, where tests are performed to check the creation of mapper and reducer cloudlets according to a config. The initial submission of mapper cloudlets to the broker is also covered under a test case.

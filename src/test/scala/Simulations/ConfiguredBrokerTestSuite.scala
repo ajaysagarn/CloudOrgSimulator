@@ -7,6 +7,9 @@ import CloudSimWrappers.{ConfiguredBroker, ConfiguredDataCenter, ConfiguredVm}
 import org.cloudbus.cloudsim.core.CloudSim
 import org.cloudbus.cloudsim.hosts.network.NetworkHost
 
+/**
+ * test suite to test the creation of broker as per a given configuration
+ */
 class ConfiguredBrokerTestSuite  extends AnyFlatSpec with Matchers {
   val Config = CloudSimUtils.getconfigValue("Saas","saasDataCenter")
 

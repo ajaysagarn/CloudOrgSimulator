@@ -6,6 +6,9 @@ import org.cloudbus.cloudsim.core.CloudSim
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
+/**
+ * Test suite to test the successful creation of vms as per a given configuration
+ */
 class ConfiguredVmsTestSuite extends AnyFlatSpec with Matchers{
   val config = CloudSimUtils.getconfigValue("Saas","saasDataCenter")
   val testSim = new CloudSim()
@@ -19,10 +22,10 @@ class ConfiguredVmsTestSuite extends AnyFlatSpec with Matchers{
     assert(vms.size == config.getInt("vm.InitialCount"))
 
     vms.foreach(vm =>{
-      assert(vm.getRam.getCapacity == config.getLong("vm.RAMInMBs"))
-      assert(vm.getBw.getCapacity == config.getLong("vm.BandwidthInMBps"))
-      assert(vm.getStorage.getCapacity == config.getLong("vm.StorageInMMapBs"))
-      assert(vm.getSubmissionDelay == config.getDouble("vm.DefaultSubmissionDelay"))
+      assert(vm.getRam.getCapacity == config.getLong("vm.RAMInMBs")) //verify ram is same as in config
+      assert(vm.getBw.getCapacity == config.getLong("vm.BandwidthInMBps")) //verify bandwidth is same as in config
+      assert(vm.getStorage.getCapacity == config.getLong("vm.StorageInMMapBs")) //verify storage is same as in config
+      assert(vm.getSubmissionDelay == config.getDouble("vm.DefaultSubmissionDelay")) //verify submissino delay is same as in config
     })
 
   }
