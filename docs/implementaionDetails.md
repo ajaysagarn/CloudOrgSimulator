@@ -66,7 +66,7 @@ Util methods have been implemented to create the correct instances of CloudSimPl
 
 ### Map Reduce
 
-All simulations in this repository receive a stream cloudlets in the form a Map-reduce Job. A configuration for the map reduce jobs is as shown below
+All simulations in this repository receive a stream of cloudlets in the form a Map-reduce Job. A configuration for the map reduce jobs is as shown below
 
 ```conf
 MapReduceJob  {
