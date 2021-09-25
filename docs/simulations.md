@@ -104,7 +104,7 @@ The Simulation is started and the total cost of running cloudlets in each of the
 
 The output from running the simulation is as shown below
 
-[ Show Simulation output image here ]
+[ Simulation Results ](./images/mixedSimResults.md)
 
 #### Conclusions:
 
