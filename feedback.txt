@@ -1,0 +1,36 @@
+Student: Ajay Sagar Nandimandalam
+Grader: Vineet Patel
+
+Homework 1
+
+The maximum grade for this homework is 8%. Points are subtracted from this maximum grade: for example, saying
+that 2% is lost if some requirement is not completed means that the resulting grade will be 8%-2% => 6%;
+if the core homework functionality does not work or it is not implemented as specified in your documentation,
+ your grade will be zero;
+
+Grading Criteria:
+ - only some basic cloud simulation examples from the cloudsim repo are given and nothing else is done:
+    * Non-trivial simulations: -0%
+ - having less than five unit and/or integration scalatests:
+    * More than 5 tests present: -0%
+ - missing comments and explanations from the simulation program:
+    * Comments present: -0%
+ - logging is not used in the simulation programs:
+    * logging configured, but print statements used: -0.1%
+ - hardcoding the input values in the source code instead of using the suggested configuration libraries:
+    * configuration used: -0%
+ - for each used var for heap-based shared variables or mutable collections:
+    * multiple uses of var: -0.2%
+ - for each used while or for or other loops with induction variables to iterate over a collection:
+    * no loops found: -0%
+ - no instructions in README.md on how to install and run your simulator:
+    * Instructions present in readme.
+ - the program crashes without completing the core functionality:
+    * program run: -0%
+ - the documentation exists but it is insufficient to understand your cloud simulation design and models and how you assembled and deployed all components of the cloud:
+    * Documentation is sufficient: -0%
+
+Total grade: 7.7%
+
+Comments: excellent job on the documentation. I like how you simulated map-reduce jobs. Overall excellent job, just
+check the grading criteria beforehand, so you don't lose points for things like using var, print, etc.
