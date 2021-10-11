@@ -1,5 +1,3 @@
-## Ajay Sagar Nandimandalam - Homework 1
-### UIN: 659867916 
 ## Create cloud simulators in Scala for evaluating executions of applications in cloud datacenters with different characteristics and deployment models.
 
 ## Running this repository
